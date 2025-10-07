@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">
+        <h4 class="mb-0">{{ email.subject or 'No subject' }}</h4>
+        <small class="text-muted">From {{ email.sender }} on {{ email.timestamp[:19].replace('T',' ') }}</small>
+      </div>
+      <div class="card-body">
+        <p class="lead">{{ email.body }}</p>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-light">Summary</div>
+      <div class="card-body">
+        {% if email.summary.summary %}
+        <ul>
+          {% for sentence in email.summary.summary %}
+          <li>{{ sentence }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">No summary available.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-light">Action Items</div>
+      <div class="card-body">
+        {% if email.action_items %}
+        <ul class="list-group list-group-flush">
+          {% for item in email.action_items %}
+          <li class="list-group-item">
+            <strong>{{ item.verb|capitalize }}</strong>: {{ item.text }}
+            {% if item.owner %}<br><small>Owner: {{ item.owner }}</small>{% endif %}
+            {% if item.due_date %}<br><small>Due: {{ item.due_date }}</small>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">No action items detected.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">Classification</div>
+      <div class="card-body">
+        <p class="h5">{{ email.classification.label }}</p>
+        <p>Confidence: {{ '{:.2f}'.format(email.classification.confidence) }}</p>
+        <h6>Scores</h6>
+        <ul class="list-group list-group-flush">
+          {% for label, score in email.classification.scores %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ label }}</span>
+            <span>{{ '{:.2f}'.format(score) }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-secondary text-white">Sentiment</div>
+      <div class="card-body">
+        <p class="h5">{{ email.sentiment.label }}</p>
+        <p>Score: {{ '{:.2f}'.format(email.sentiment.score) }}</p>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-light">Named Entities</div>
+      <div class="card-body">
+        {% if email.entities.entities %}
+        <ul class="list-group list-group-flush">
+          {% for ent in email.entities.entities %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ ent.text }}</span>
+            <span class="badge bg-info text-dark">{{ ent.label }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">No entities extracted.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">Word Senses & Relationships</div>
+      <div class="card-body">
+        <h6>Relationships</h6>
+        {% if email.entities.relationships %}
+        <ul>
+          {% for rel in email.entities.relationships %}
+          <li>{{ rel.subject }} — {{ rel.relation }} → {{ rel.obj }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">No relationships detected.</p>
+        {% endif %}
+        <h6 class="mt-3">Word Senses</h6>
+        {% if email.entities.word_senses %}
+        <ul>
+          {% for sense in email.entities.word_senses %}
+          <li>
+            <strong>{{ sense.word }}</strong>: {{ sense.definition }}
+            <div class="text-muted">({{ sense.sense }})</div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">No senses determined.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

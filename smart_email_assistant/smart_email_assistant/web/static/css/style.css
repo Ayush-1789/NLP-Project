@@ -1,0 +1,15 @@
+body {
+  background-color: #f7f9fc;
+}
+
+.card {
+  border-radius: 0.75rem;
+}
+
+.list-group-item {
+  border: none;
+}
+
+.navbar-brand {
+  font-weight: 600;
+}

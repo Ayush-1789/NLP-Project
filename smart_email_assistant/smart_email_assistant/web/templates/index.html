@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-3">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">Analytics</div>
+      <div class="card-body">
+        <p class="lead mb-1">Total Emails: {{ analytics.totals.emails }}</p>
+        <p class="mb-1">Action Items: {{ analytics.totals.action_items }}</p>
+        <p class="mb-3">Entities: {{ analytics.totals.entities }}</p>
+        <h6>Categories</h6>
+        <ul class="list-group list-group-flush mb-3">
+          {% for category, count in analytics.categories.items() %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ category }}
+            <span class="badge bg-secondary">{{ count }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        <h6>Sentiments</h6>
+        <ul class="list-group list-group-flush">
+          {% for sentiment, count in analytics.sentiments.items() %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ sentiment }}
+            <span class="badge bg-secondary">{{ count }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-9">
+    <div class="card shadow-sm">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <span>Inbox</span>
+        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#composeModal">Process Email</button>
+      </div>
+      <div class="list-group list-group-flush">
+        {% for email in emails %}
+        <a href="{{ url_for('email_detail', email_id=email.email_id) }}" class="list-group-item list-group-item-action">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{ email.subject or 'No subject' }}</h5>
+            <small>{{ email.timestamp[:19].replace('T', ' ') }}</small>
+          </div>
+          <p class="mb-1">{{ email.body[:160] }}...</p>
+          <small>Category: <strong>{{ email.classification.label }}</strong> — Sentiment: {{ email.sentiment.label }}</small>
+        </a>
+        {% else %}
+        <div class="list-group-item">
+          <p class="mb-0">No emails processed yet.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="composeModal" tabindex="-1" aria-labelledby="composeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="process-form">
+        <div class="modal-header">
+          <h5 class="modal-title" id="composeModalLabel">Process Email</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Sender</label>
+            <input type="email" class="form-control" name="sender" placeholder="sender@example.com" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Subject</label>
+            <input type="text" class="form-control" name="subject" placeholder="Subject" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Body</label>
+            <textarea class="form-control" name="body" rows="6" placeholder="Paste email content here" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Process</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('process-form');
+    if (!form) {
+      return;
+    }
+
+    form.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
+
+      try {
+        const response = await fetch("{{ url_for('process_single') }}", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        window.location.reload();
+      } catch (error) {
+        console.error('Failed to process email:', error);
+        const alertPlaceholder = document.createElement('div');
+        alertPlaceholder.className = 'alert alert-danger mt-3';
+        alertPlaceholder.role = 'alert';
+        alertPlaceholder.textContent = 'Unable to process email right now. Please try again in a moment.';
+        form.closest('.modal-content').querySelector('.modal-body').append(alertPlaceholder);
+      }
+    });
+  });
+</script>
+{% endblock %}

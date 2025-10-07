@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1",
+    "subject": "Quarterly Review Meeting",
+    "sender": "ceo@example.com",
+    "body": "Hi team, please prepare the quarterly results and schedule a review meeting with the leadership by next Friday. We need to finalize action items and update the strategy document.",
+    "timestamp": "2025-09-01T09:00:00",
+    "category": "Urgent"
+  },
+  {
+    "id": "2",
+    "subject": "Invoice Reminder",
+    "sender": "finance@example.com",
+    "body": "Dear vendor, this is a friendly reminder to send the invoice for the recent engagement. Please submit the invoice by the end of this week to avoid delays.",
+    "timestamp": "2025-09-03T15:30:00",
+    "category": "Important"
+  },
+  {
+    "id": "3",
+    "subject": "Lunch Invitation",
+    "sender": "colleague@example.com",
+    "body": "Hey there! Let's catch up for lunch next Wednesday at the cafe downtown. Let me know if that works for you.",
+    "timestamp": "2025-09-05T12:45:00",
+    "category": "Normal"
+  },
+  {
+    "id": "4",
+    "subject": "You won a prize!",
+    "sender": "spam@scam.com",
+    "body": "Congratulations! You have been selected to win a cash prize. Click the link to claim your lottery winnings now.",
+    "timestamp": "2025-09-06T08:15:00",
+    "category": "Spam"
+  }
+]
