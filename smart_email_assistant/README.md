@@ -17,8 +17,7 @@ A comprehensive NLP-powered email processing system that automatically categoriz
 Install dependencies:
 
 ```bash
-pip install -r requirements.txt
-python -m spacy download en_core_web_sm
+pip install -r requirements.txt  # installs dependencies and the spaCy model
 ```
 
 ## Quick Start
